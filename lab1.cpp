@@ -4,75 +4,96 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include <cstdio>
-#include "Shader.h"
+
+int speed = 300;
+
+int waitSpeed = 100;
+
 
 using namespace glm;
 
+//quit after the esc button is pressed
 void processInput(GLFWwindow* window);
+//draw the UI
 void display();
+//init something about the glfw
 void myGlfwInit();
+//make the vertex and fragment shader
 unsigned int generateShader();
+
 void bind();
 
 
+//the triangle on the top
 GLfloat triangle1[] = {
-    -2.0f, 2.0f, 0,   1.0f, 1.0f, 1.0f,
-    0,     0,    0,   1.0f, 1.0f, 1.0f,
-    2.0f,  2.0f, 0,   1.0f, 1.0f, 1.0f
+    -0.75f, 0.75f, 0,   1.0f, 1.0f, 1.0f,
+    -0.5f,     0.5f,    0,   1.0f, 1.0f, 1.0f,
+    -0.25f,  0.75f, 0,   1.0f, 1.0f, 1.0f
 };
 
+//the triangle on the left
 GLfloat triangle2[] = {
-    -2.0f,  2.0f,  0,   0.0f, 1.0f, 0.0f,
-    0,      0,     0,   0.0f, 1.0f, 0.0f,
-    -2.0f,  -2.0f, 0,   0.0f, 1.0f, 0.0f
+    -0.75f,  0.75f,  0,   0.0f, 1.0f, 0.0f,
+    -0.5f,      0.5f,     0,   0.0f, 1.0f, 0.0f,
+    -0.75f,  0.25f, 0,   0.0f, 1.0f, 0.0f
 };
 
+
+//the triangle on the right down
 GLfloat triangle3[] = {
-        2.0f,  0.0f,  0,   0.0f, 1.0f, 1.0f,
-        2.0,   -2.0f, 0,   0.0f, 1.0f, 1.0f,
-        0.0f,  -2.0f, 0,   0.0f, 1.0f, 1.0f
+        -0.25f,  0.5f,  0,   0.0f, 1.0f, 1.0f,
+        -0.25f,   0.25f, 0,   0.0f, 1.0f, 1.0f,
+        -0.5f,  0.25f, 0,   0.0f, 1.0f, 1.0f
 };
 
+//the triangle on the up down
 GLfloat triangle4[] = {
-        2.0f,  2.0f,  0,   0.0f, 0.0f, 1.0f,
-        1.0f,  1.0f,  0,   0.0f, 0.0f, 1.0f,
-        2.0f,  0.0f,  0,   0.0f, 0.0f, 1.0f
+        -0.25f,  0.75f,  0,   0.0f, 0.0f, 1.0f,
+        -0.375f,  0.625f,  0,   0.0f, 0.0f, 1.0f,
+        -0.25f,  0.5f,  0,   0.0f, 0.0f, 1.0f
 };
 
+//the triangle on the middle
 GLfloat triangle5[] = {
-        1.0f,  -1.0f,  0,   1.0f, 1.0f, 0.0f,
-        0,      0,     0,   1.0f, 1.0f, 0.0f,
-        -1.0f,  -1.0f, 0,   1.0f, 1.0f, 0.0f
+        -0.375f,  0.375f,  0,   1.0f, 1.0f, 0.0f,
+        -0.5f,    0.5f,     0,   1.0f, 1.0f, 0.0f,
+        -0.625f,  0.375f, 0,   1.0f, 1.0f, 0.0f
 };
 
+
+//the square
 GLfloat square[] = {
-        1.0f,  -1.0f,  0,   1.0f, 0.0f, 0.0f,
-        0,      0,     0,   1.0f, 0.0f, 0.0f,
-        1.0f,  1.0f, 0,     1.0f, 0.0f, 0.0f,
-        2.0f,  0.0f, 0,     1.0f, 0.0f, 0.0f
+        -0.375f,  0.375f,  0,   1.0f, 0.0f, 0.0f,
+        -0.5f,      0.5,     0,   1.0f, 0.0f, 0.0f,
+        -0.375f,  0.625f, 0,     1.0f, 0.0f, 0.0f,
+        -0.25f,  0.5f, 0,     1.0f, 0.0f, 0.0f
 };
 
 
+//the parallelogram
 GLfloat  parallelogram[] = {
-        1.0f,  -1.0f,  0,     1.0f, 0.0f, 1.0f,
-        0,      -2.0f, 0,     1.0f, 0.0f, 1.0f,
-        -2.0f,  -2.0f, 0,     1.0f, 0.0f, 1.0f,
-        -1.0f,  -1.0f, 0,     1.0f, 0.0f, 1.0f
+        -0.375f,  0.375f,  0,     1.0f, 0.0f, 1.0f,
+        -0.5f,      0.25f, 0,     1.0f, 0.0f, 1.0f,
+        -0.75f,  0.25f, 0,     1.0f, 0.0f, 1.0f,
+        -0.625f,  0.375f, 0,     1.0f, 0.0f, 1.0f
 };
 
-
+//the indices about the square
 unsigned int indicesSquare[] = {
         0, 1, 3,
         1, 2, 3
 };
 
 
+//the indices about the square
 unsigned int indicesParallelogram[] = {
         0, 1, 3,
         1, 2, 3
 };
+
+
+//vertexShaderSource
 const char* vertexShaderSource =
         "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
@@ -87,7 +108,7 @@ const char* vertexShaderSource =
         "    myColor = color; "
         "}";
 
-
+//fragmentShaderSource
 const char* fragmentShaderSource =
         "#version 330 core\n"
         "out vec4 FragColor;\n"
@@ -98,44 +119,40 @@ const char* fragmentShaderSource =
         "} ";
 
 
-void normalize(GLfloat shape[], int len)
-{
-    for(int i = 0; i < len; i++)
-    {
-        if(i%6 == 0)
-        {
-            shape[i] -= 4;
-        } else if(i%6 == 1)
-        {
-            shape[i] += 4;
-        }
 
-        if(i%6 == 0 || i%6 == 1)
-            shape[i] = shape[i]/8;
-    }
-}
 
 
 GLuint VBOs[7], VAOs[7], EBO[2]; // create VBO and VAO arrays for the two triangles
-GLFWwindow* window;
-unsigned int shaderProgram;
+GLFWwindow* window;   //the GLFWwindow
+unsigned int shaderProgram;  // the shader program
 
-
+//the base trans
 glm::mat4 trans = glm::mat4(1.0f);
 
 
+//the transform for each shape when rendering
+glm::mat4 trans1, trans2, trans3, trans4, trans5, trans6, trans7;
+
+
+// the movement from the origin position to the destination for each shape
+glm::vec3  move1(1.25f, -1.25f, 1.0f);
+glm::vec3  move2(0.0f, -1.00f, 1.0f);
+glm::vec3  move3(0.5f, 0.205f, 1.0f);
+glm::vec3  move4(-0.375f, -0.875f, 1.0f);
+glm::vec3  move5(0.375f, 0.125f, 1.0f);
+glm::vec3  move6(-0.125f, -0.325f, 1.0f);
+glm::vec3  move7(0.875f, -0.875f, 1.0f);
+
+
+
+
+
+int order = 0;
+int waitTime = 0;
+
 int main() {
-    //trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
 
-    normalize(triangle1, sizeof(triangle1)/ sizeof(GLfloat));
-    normalize(triangle2, sizeof(triangle2)/ sizeof(GLfloat));
-    normalize(triangle3, sizeof(triangle3)/ sizeof(GLfloat));
-    normalize(triangle4, sizeof(triangle4)/ sizeof(GLfloat));
-    normalize(triangle5, sizeof(triangle5)/ sizeof(GLfloat));
-    normalize(square, sizeof(square)/ sizeof(GLfloat));
-    normalize(parallelogram, sizeof(parallelogram )/ sizeof(GLfloat));
 
 
     myGlfwInit();
@@ -148,22 +165,18 @@ int main() {
 
     shaderProgram = generateShader();
 
-
-
+    // render loop
     while (!glfwWindowShouldClose(window))
     {
-
 
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
 
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         display();
 
-
-
+        // check and call events and swap the buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -175,6 +188,11 @@ int main() {
 
 void bind()
 {
+
+
+    //bind the VAO and VBO
+
+
     glGenVertexArrays(7, VAOs);
     glGenBuffers(7, VBOs);
     glGenBuffers(2, EBO);
@@ -251,30 +269,83 @@ void bind()
 void display()
 {
 
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+    if(waitTime > 0)
+    {
+        waitTime--;
+    } else
+    {
+        order = (order+1)%(speed+1);
+        if(order == 0 || order == speed )
+            waitTime = waitSpeed;
+    }
 
+    float a = (order)*1.0/speed;
+
+    float first, second;
+
+
+    if(order > speed/2)
+    {
+        first = 1.0f;
+        second = 2*a-1;
+    } else
+    {
+        first = a*2;
+        second = 0.0f;
+    }
+
+
+    trans1 = glm::translate(trans, move1*glm::vec3(a,a,a));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans1));
     glBindVertexArray(VAOs[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
+    trans2 = glm::rotate(trans, glm::radians(90.0f*first), glm::vec3(0, 0, 1.0f));
+    trans2 = glm::translate(trans2, move2*glm::vec3(second,second,second));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans2));
     glBindVertexArray(VAOs[1]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
+    trans3 = glm::translate(trans, move3*glm::vec3(first, first, first));
+    trans3 = glm::rotate(trans3, glm::radians(135.0f*second), glm::vec3(0, 0, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans3));
     glBindVertexArray(VAOs[2]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
+    trans4 = glm::rotate(trans, glm::radians(90.0f*first), glm::vec3(0, 0, 1.0f));
+    trans4 = glm::translate(trans4, move4*glm::vec3(second,second,second));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans4));
     glBindVertexArray(VAOs[3]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
+    trans5 = glm::rotate(trans, glm::radians(180.0f*first), glm::vec3(0, 0, 1.0f));
+    trans5 = glm::translate(trans5, move5*glm::vec3(second,second,second));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans5));
     glBindVertexArray(VAOs[4]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
+    trans6 = glm::translate(trans, move6*glm::vec3(first, first, first));
+    trans6 = glm::rotate(trans6, glm::radians(225.0f*second), glm::vec3(0, 0, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans6));
     glBindVertexArray(VAOs[5]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+    trans7 = glm::translate(trans, move7*glm::vec3(a,a,a));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans7));
     glBindVertexArray(VAOs[6]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+
+
+
 }
 
 

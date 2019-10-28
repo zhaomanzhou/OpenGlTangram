@@ -1,28 +1,28 @@
 cmake_minimum_required(VERSION 3.13)
-project(OpenGLTest)
+project(lab1)
 
 set(CMAKE_CXX_STANDARD 11)
-set(glfw3_DIR /usr/lib/x86_64-linux-gnu/cmake/glfw3)
 
 
-add_executable(OpenGLTest lab1.cpp
-        Shader.cpp)
+add_executable(lab1 main.cpp)
 
 
 
 
 find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
-find_package(glfw3 REQUIRED)
-find_package(glm REQUIRED)
+
 
 find_package(GLEW REQUIRED)
-if (GLEW_FOUND)
-    include_directories($(GLEW_INCLUDE_DIRS))
-    message("not found")
-endif (GLEW_FOUND)
 
 
-include_directories(${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${glfw3_INCLUDE_DIRS}  ${glm_INCLUDE_DIRS}  glfw)
 
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}   ${glm_LIBRARY}  /usr/lib/x86_64-linux-gnu/libglfw.so.3.2 )
+include_directories(${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS}
+
+        /usr/local/Cellar/glfw/3.3/include/
+        /usr/local/Cellar/glew/2.1.0/include/
+        /usr/local/Cellar/glm/0.9.9.5/include/
+        )
+
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}
+        /usr/local/Cellar/glfw/3.3/lib/libglfw.3.dylib
+        /usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib )
